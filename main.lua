@@ -4,7 +4,7 @@ local UI = require('ExpressYourself/ui')
 local ExpressYourselfAddon = {
     name = "Express Yourself",
     author = "Misosoup",
-    version = "0.1",
+    version = "0.2",
     desc = "Express emotions while chatting"
 }
 
@@ -23,11 +23,13 @@ end
 
 local function OnChatMessage(channelId, speakerId, _, speakerName, message)
     if (speakerName ~= playerName) then return end
-    -- if (channelId == -3 or channelId == -4) then return end -- whispers
+    if (channelId == -3 or channelId == -4) then return end -- whispers
 
     local emotion = helpers.detectEmotion(message, items)
     if (emotion ~= nil) then X2Chat:ExpressEmotion(emotion) end
 end
+
+local function updateItems() items = helpers.getItems() end
 
 local function Load()
     -- Init canvas
@@ -44,8 +46,7 @@ local function Load()
     playerName = api.Unit:GetUnitNameById(unitId)
 
     -- init UI
-    UI.Init()
-    UI.ShowList()
+    UI.Init(updateItems)
 
     api.Log:Info("Loaded " .. ExpressYourselfAddon.name .. " v" ..
                      ExpressYourselfAddon.version .. " by " ..
@@ -64,6 +65,7 @@ end
 
 ExpressYourselfAddon.OnLoad = Load
 ExpressYourselfAddon.OnUnload = Unload
+ExpressYourselfAddon.OnSettingToggle = UI.ShowList
 api.On("CHAT_MESSAGE", OnChatMessage)
 
 return ExpressYourselfAddon

@@ -4,13 +4,17 @@ local helpers = require('ExpressYourself/util/helpers')
 local UI = {}
 local listWnd
 local pageSize = 3
-
-UI.Init = function() UI.CreateList() end
+UI.updateItems = nil
+UI.Init = function(updateItems)
+    UI.updateItems = updateItems
+    UI.CreateList()
+end
 UI.ShowList = function() if listWnd ~= nil then listWnd:Show(true) end end
 
 UI.listCtrl = nil
 UI.listItems = {}
 UI.listControls = {}
+
 UI.ListRowSetFunc = function(subItem, data, setValue)
     if setValue then
         -- Data Assignments
@@ -250,6 +254,7 @@ UI.SaveButtonClicked = function(realIndex, index)
     end
     helpers.saveItems(savedData)
     api.Log:Info('Saved keywords for emotion "' .. data.emotion .. '"')
+    UI.updateItems()
 end
 
 UI.DeleteListItem = function(realIndex, index)
@@ -279,6 +284,8 @@ UI.DeleteListItem = function(realIndex, index)
         UI.listCtrl.pageControl:SetCurrentPage(curPage, true)
 
     end
+
+    UI.updateItems()
 end
 
 UI.AddNewButtonClicked = function()
@@ -298,6 +305,7 @@ UI.AddNewButtonClicked = function()
     UI.listCtrl.pageControl.maxPage = UI.maxPage or 1
 
     UI.listCtrl.pageControl:SetCurrentPage(1, true)
+    UI.updateItems()
 end
 
 UI.UnLoad = function()
